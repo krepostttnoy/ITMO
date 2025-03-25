@@ -2,6 +2,7 @@ package commands
 
 import collection.CollectionManager
 import console.IVehicleManager
+import utils.inputOutput.OutputManager
 
 /**
  * Команда для добавления нового транспортного средства в коллекцию.
@@ -13,7 +14,8 @@ import console.IVehicleManager
  */
 class AddCommand(
     private val cm: CollectionManager,
-    private val vm: IVehicleManager
+    private val vm: IVehicleManager,
+    private val outputManager: OutputManager
 ) : Command {
 
     /**
@@ -27,8 +29,8 @@ class AddCommand(
         try {
             val newVehicle = vm.setVehicle()
             cm.addVehicle(newVehicle)
-            println("Object was added.")
-        } catch (e: IllegalArgumentException) {
+            outputManager.println("Object was added.")
+        } catch (e: Error) {
             println("Object can't be added.")
         }
     }

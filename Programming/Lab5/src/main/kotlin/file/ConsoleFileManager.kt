@@ -4,6 +4,8 @@ import baseClasses.Coordinates
 import baseClasses.FuelType
 import baseClasses.Vehicle
 import collection.CollectionManager
+import utils.inputOutput.InputManager
+import utils.inputOutput.OutputManager
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.BufferedReader
@@ -22,7 +24,11 @@ import java.io.InputStreamReader
  * @constructor Создаёт экземпляр [ConsoleFileManager] с заданным менеджером [collectionManager].
  * Загружает данные из файла, указанного в переменной окружения CSV_FILE_PATH, или использует путь по умолчанию.
  */
-class ConsoleFileManager(private val collectionManager: CollectionManager) : IFileManager {
+class ConsoleFileManager(
+    private val collectionManager: CollectionManager,
+    private val outputManager: OutputManager,
+    private val inputManager: InputManager
+    ) : IFileManager {
 
     /**
      * Путь к файлу для чтения и записи данных.
@@ -60,6 +66,7 @@ class ConsoleFileManager(private val collectionManager: CollectionManager) : IFi
         try {
             val file = File(filePath)
             if (file.exists()) {
+                inputManager.startScriptRead(filePath)
                 BufferedInputStream(FileInputStream(file)).use { inputStream ->
                     BufferedReader(InputStreamReader(inputStream, Charsets.UTF_8)).use { reader ->
                         var lineNumber = 1
@@ -70,7 +77,7 @@ class ConsoleFileManager(private val collectionManager: CollectionManager) : IFi
 
                             val params = line!!.split(",").map { it.trim() }
                             if (params.size != 7) {
-                                println("Строка $lineNumber пропущена. Кол-во элементов ${params.size} вместо 7")
+                                outputManager.println("Строка $lineNumber пропущена. Кол-во элементов ${params.size} вместо 7")
                                 continue
                             }
 
@@ -132,17 +139,18 @@ class ConsoleFileManager(private val collectionManager: CollectionManager) : IFi
                                 )
                                 collectionManager.getCollection().add(vehicle)
                             } catch (e: NumberFormatException) {
-                                println("Warning: Line $lineNumber skipped - ${e.message}")
+                                outputManager.println("Warning: Line $lineNumber skipped - ${e.message}")
                             } catch (e: IllegalArgumentException) {
-                                println("Warning: Line $lineNumber skipped - ${e.message}")
+                                outputManager.println("Warning: Line $lineNumber skipped - ${e.message}")
                             } catch (e: Exception) {
-                                println("Warning: Line $lineNumber skipped - invalid data: ${e.message}")
+                                outputManager.println("Warning: Line $lineNumber skipped - invalid data: ${e.message}")
                             }
                         }
                     }
                 }
+                inputManager.finishScriptRead()
             } else {
-                println("File $filePath not found. Starting with empty collection.")
+                outputManager.println("File $filePath not found. Starting with empty collection.")
             }
         } catch (e: Exception) {
             throw IllegalArgumentException("Error reading CSV file: ${e.message}")
@@ -155,7 +163,7 @@ class ConsoleFileManager(private val collectionManager: CollectionManager) : IFi
      *
      * @param filePath Путь к файлу, в который нужно сохранить данные.
      */
-    override fun saveToFile(filePath: String) {
+    override fun saveToFile() {
         try {
             val file = File(filePath)
             BufferedOutputStream(FileOutputStream(file)).use { outputStream ->
@@ -169,9 +177,9 @@ class ConsoleFileManager(private val collectionManager: CollectionManager) : IFi
                     outputStream.write(line.toByteArray(Charsets.UTF_8))
                 }
             }
-            println("Коллекция успешно сохранена в файл: $filePath")
+                outputManager.println("Коллекция успешно сохранена в файл: $filePath")
         } catch (e: Exception) {
-            println("Ошибка при сохранении. ${e.message}")
+            outputManager.println("Ошибка при сохранении. ${e.message}")
         }
     }
 }

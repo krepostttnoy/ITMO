@@ -3,6 +3,8 @@ package commands
 import baseClasses.Vehicle
 import collection.CollectionManager
 import console.ConsoleReadValid
+import utils.inputOutput.InputManager
+import utils.inputOutput.OutputManager
 
 /**
  * Команда для удаления транспортного средства из коллекции по его идентификатору.
@@ -11,7 +13,11 @@ import console.ConsoleReadValid
  * @property cm Менеджер коллекции, содержащий список транспортных средств.
  * @constructor Создаёт команду [RemoveByIdCommand] с заданным менеджером [cm].
  */
-class RemoveByIdCommand(private val cm: CollectionManager) : Command {
+class RemoveByIdCommand(
+    private val cm: CollectionManager,
+    private val outputManager: OutputManager,
+    private val inputManager: InputManager
+    ) : Command {
 
     /**
      * Выполняет команду удаления транспортного средства по указанному идентификатору.
@@ -27,22 +33,22 @@ class RemoveByIdCommand(private val cm: CollectionManager) : Command {
      * @param idStr Строковое представление идентификатора элемента для удаления (может быть null).
      */
     fun execute(idStr: String?) {
-        val console = ConsoleReadValid()
+        val console = ConsoleReadValid(outputManager, inputManager)
 
         if (cm.baseCollection.isEmpty()) {
-            println("Коллекция пуста. Перед удалением добавьте элементы с помощью команды 'add'.")
+            outputManager.println("Коллекция пуста. Перед удалением добавьте элементы с помощью команды 'add'.")
             return
         }
 
         if (idStr == null) {
-            println("Текущие элементы:")
+            outputManager.println("Текущие элементы:")
             cm.baseCollection.forEach { vehicle ->
-                println("ID: ${vehicle.id}")
+                outputManager.println("ID: ${vehicle.id}")
             }
         }
 
         val id: Int? = if (idStr == null) {
-            print("Введите ID элемента, который хотите удалить: ")
+            outputManager.print("Введите ID элемента, который хотите удалить: ")
             console.readInt()
         } else {
             idStr.toIntOrNull()
@@ -50,7 +56,7 @@ class RemoveByIdCommand(private val cm: CollectionManager) : Command {
 
         val index = cm.baseCollection.indexOfFirst { it.id == id }
         if (index == -1) {
-            println("Элемента с ID = $id не существует.")
+            outputManager.println("Элемента с ID = $id не существует.")
             return
         }
 
@@ -58,7 +64,7 @@ class RemoveByIdCommand(private val cm: CollectionManager) : Command {
         cm.baseCollection.removeAt(index)
         Vehicle.removeId(vehicleToRemove.id)
 
-        println("Элемент удален.")
+        outputManager.println("Элемент удален.")
     }
 
     /**

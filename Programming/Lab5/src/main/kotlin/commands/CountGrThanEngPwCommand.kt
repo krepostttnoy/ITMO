@@ -5,6 +5,7 @@ import baseClasses.Vehicle
 import collection.CollectionManager
 import console.ConsoleReadValid
 import console.Read
+import utils.inputOutput.OutputManager
 import kotlin.text.toFloatOrNull
 
 /**
@@ -18,7 +19,8 @@ import kotlin.text.toFloatOrNull
  */
 class CountGrThanEngPwCommand(
     private val cm: CollectionManager,
-    private val rm: Read
+    private val rm: Read,
+    private val outputManager: OutputManager
 ) : Command {
 
     /**
@@ -35,12 +37,12 @@ class CountGrThanEngPwCommand(
      */
     fun execute(enginePowerStr: String? = null) {
         if (cm.baseCollection.isEmpty()) {
-            println("Коллекция пуста.")
+            outputManager.println("Коллекция пуста.")
             return
         }
 
         val engPower = enginePowerStr?.toFloatOrNull() ?: run {
-            print("Введите enginePower для сравнения: ")
+            outputManager.print("Введите enginePower для сравнения: ")
             rm.readFloat() ?: return
         }
 
@@ -55,7 +57,7 @@ class CountGrThanEngPwCommand(
 
         val count = cm.baseCollection.filter { it > element }.size
 
-        println("Кол-во объектов enginePower которых больше $engPower -> $count")
+            outputManager.println("Кол-во объектов enginePower которых больше $engPower -> $count")
     }
 
     /**

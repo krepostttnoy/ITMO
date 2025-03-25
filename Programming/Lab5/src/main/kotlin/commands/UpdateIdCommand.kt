@@ -5,6 +5,8 @@ import baseClasses.Vehicle
 import collection.CollectionManager
 import console.ConsoleReadValid
 import console.ConsoleReadManager
+import utils.inputOutput.InputManager
+import utils.inputOutput.OutputManager
 
 /**
  * Команда для обновления данных транспортного средства в коллекции по его идентификатору.
@@ -15,12 +17,16 @@ import console.ConsoleReadManager
  * @property console Объект для чтения и валидации данных из консоли.
  * @constructor Создаёт команду [UpdateIdCommand] с заданным менеджером [cm].
  */
-class UpdateIdCommand(private val cm: CollectionManager) : Command {
+class UpdateIdCommand(
+    private val cm: CollectionManager,
+    private val outputManager: OutputManager,
+    private val inputManager: InputManager
+    ) : Command {
 
     /**
      * Объект для чтения и валидации данных из консоли.
      */
-    val console = ConsoleReadValid()
+    val console = ConsoleReadValid(outputManager, inputManager)
 
     /**
      * Выполняет команду обновления данных транспортного средства по указанному идентификатору.
@@ -37,21 +43,21 @@ class UpdateIdCommand(private val cm: CollectionManager) : Command {
     override fun execute() {
         if (cm.baseCollection.isNotEmpty()) {
             cm.baseCollection.forEach { vehicle ->
-                println("Список доступных ID: ${vehicle.id}, name - ${vehicle.name}")
+                outputManager.println("Список доступных ID: ${vehicle.id}, name - ${vehicle.name}")
             }
-            println("Введите ID элемента для обновления: ")
+            outputManager.println("Введите ID элемента для обновления: ")
             val id = console.readInt() ?: return println("Неверный ID. Повторите попытку.")
             val index = cm.baseCollection.indexOfFirst { it.id == id }
             if (index == -1) {
-                println("Элемента с ID = $id не существует.")
+                outputManager.println("Элемента с ID = $id не существует.")
                 return
             }
 
-            print("Какое поле обновить? (name, coordinates, enginePower, capacity, distanceTravelled, fuelType): ")
+            outputManager.print("Какое поле обновить? (name, coordinates, enginePower, capacity, distanceTravelled, fuelType): ")
             val field = console.readLineTrimmed()
             val oldVehicle = cm.baseCollection[index]
             Vehicle.removeId(oldVehicle.id)
-            val rm = ConsoleReadManager()
+            val rm = ConsoleReadManager(outputManager, inputManager)
             val newVehicle = when (field) {
                 "name" -> {
                     val newName = rm.readName()
@@ -80,14 +86,14 @@ class UpdateIdCommand(private val cm: CollectionManager) : Command {
                     oldVehicle.copy(fuelType = newFuelType)
                 }
                 else -> {
-                    println("Неверное поле. Доступные поля: name, coordinates, enginePower, capacity, distanceTravelled, fuelType")
+                    outputManager.println("Неверное поле. Доступные поля: name, coordinates, enginePower, capacity, distanceTravelled, fuelType")
                     oldVehicle
                 }
             }
 
             cm.baseCollection[index] = newVehicle
         } else {
-            println("Коллекция пуста.\nПеред вызовом этой функции заполните коллекцию.")
+            outputManager.println("Коллекция пуста.\nПеред вызовом этой функции заполните коллекцию.")
         }
     }
 }

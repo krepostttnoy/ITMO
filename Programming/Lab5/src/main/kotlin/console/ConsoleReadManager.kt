@@ -1,6 +1,8 @@
 package console
 
 import baseClasses.FuelType
+import utils.inputOutput.InputManager
+import utils.inputOutput.OutputManager
 
 /**
  * Класс для чтения данных с консоли с валидацией.
@@ -9,12 +11,15 @@ import baseClasses.FuelType
  * @property console Объект для чтения и валидации данных из консоли.
  * @constructor Создаёт экземпляр [ConsoleReadManager] с объектом [ConsoleReadValid] для чтения данных.
  */
-class ConsoleReadManager : IReadManager {
+class ConsoleReadManager(
+    private val outputManager: OutputManager,
+    private val inputManager: InputManager
+) : IReadManager {
 
     /**
      * Объект для чтения и валидации данных из консоли.
      */
-    private val console = ConsoleReadValid()
+    private val console = ConsoleReadValid(outputManager, inputManager)
 
     /**
      * Запрашивает у пользователя ввод имени транспортного средства.
@@ -23,15 +28,7 @@ class ConsoleReadManager : IReadManager {
      * @return Введённое имя транспортного средства.
      */
     override fun readName(): String {
-        while (true) {
-            print("Введите имя: ")
-            val name = console.readLineTrimmed()
-            if (name.isNotBlank()) {
-                return name
-            } else {
-                println("Введите корректное имя.")
-            }
-        }
+        return console.validName()
     }
 
     /**
@@ -43,19 +40,7 @@ class ConsoleReadManager : IReadManager {
      * @throws IllegalArgumentException Если введённое значение меньше или равно -818.
      */
     override fun readCoordinateX(): Long {
-        while (true) {
-            try {
-                print("Введите координату X: ")
-                val coordinate = console.readLong()
-                if (coordinate > -818) {
-                    return coordinate
-                } else throw IllegalArgumentException("Х должен быть > -818.")
-            } catch (e: NumberFormatException) {
-                println("Ошибка: Введено некорректное число. Попробуйте ещё раз.")
-            } catch (e: IllegalArgumentException) {
-                println("Ошибка: ${e.message}")
-            }
-        }
+        return console.validReadCoordinateX()
     }
 
     /**
@@ -67,19 +52,7 @@ class ConsoleReadManager : IReadManager {
      * @throws IllegalArgumentException Если введённое значение больше 730.
      */
     override fun readCoordinateY(): Long {
-        while (true) {
-            try {
-                print("Введите координату Y: ")
-                val coordinate = console.readLong()
-                if (coordinate <= 730) {
-                    return coordinate
-                } else throw IllegalArgumentException("Y должен быть <= 730.")
-            } catch (e: NumberFormatException) {
-                println("Ошибка: Введено некорректное число. Попробуйте ещё раз.")
-            } catch (e: IllegalArgumentException) {
-                println("Ошибка: ${e.message}")
-            }
-        }
+        return console.validReadCoordinateY()
     }
 
     /**
@@ -91,21 +64,7 @@ class ConsoleReadManager : IReadManager {
      * @throws IllegalArgumentException Если введённое значение меньше или равно 0.
      */
     override fun readEnginePower(): Float? {
-        while (true) {
-            try {
-                print("Введите мощность двигателя: ")
-                val enginePower = console.readFloat()
-                if (enginePower != null) {
-                    if (enginePower > 0) {
-                        return enginePower
-                    } else throw IllegalArgumentException("Мощность должна быть > 0.")
-                } else throw NumberFormatException("Введено некорректное число.")
-            } catch (e: NumberFormatException) {
-                println("Ошибка: ${e.message}")
-            } catch (e: IllegalArgumentException) {
-                println("Ошибка: ${e.message}")
-            }
-        }
+        return console.validReadEnginePower()
     }
 
     /**
@@ -117,21 +76,7 @@ class ConsoleReadManager : IReadManager {
      * @throws IllegalArgumentException Если введённое значение меньше или равно 0.
      */
     override fun readCapacity(): Float {
-        while (true) {
-            try {
-                print("Введите емкость двигателя: ")
-                val capacity = console.readFloat()
-                if (capacity != null) {
-                    if (capacity > 0) {
-                        return capacity
-                    } else throw IllegalArgumentException("Емкость должна быть > 0.")
-                } else throw NumberFormatException("Введено некорректное число.")
-            } catch (e: NumberFormatException) {
-                println("Ошибка: ${e.message}")
-            } catch (e: IllegalArgumentException) {
-                println("Ошибка: ${e.message}")
-            }
-        }
+        return console.validReadCapacity()
     }
 
     /**
@@ -143,21 +88,7 @@ class ConsoleReadManager : IReadManager {
      * @throws IllegalArgumentException Если введённое значение меньше 0.
      */
     override fun readDistanceTravelled(): Int {
-        while (true) {
-            try {
-                print("Введите пробег: ")
-                val distanceTravelled = console.readInt()
-                if (distanceTravelled != null) {
-                    if (distanceTravelled >= 0) {
-                        return distanceTravelled
-                    } else throw IllegalArgumentException("Пробег должен быть >= 0.")
-                } else throw NumberFormatException("Введено некорректное число. Попробуйте ещё раз.")
-            } catch (e: NumberFormatException) {
-                println("Ошибка: ${e.message}")
-            } catch (e: IllegalArgumentException) {
-                println("Ошибка: ${e.message}")
-            }
-        }
+        return console.validReadDistanceTravelled()
     }
 
     /**
@@ -168,23 +99,6 @@ class ConsoleReadManager : IReadManager {
      * @throws IllegalArgumentException Если введённый тип топлива некорректен.
      */
     override fun readFuelType(): FuelType {
-        while (true) {
-            try {
-                print("Введите тип топлива: ")
-                val fuelType = console.readLineTrimmed()
-
-                return when (fuelType.lowercase()) {
-                    "электричество", "электро" -> FuelType.ELECTRICITY
-                    "анти", "антиматерия" -> FuelType.ANTIMATTER
-                    "дизель", "диз" -> FuelType.DIESEL
-                    else -> throw IllegalArgumentException(
-                        "Ошибка: некорректный тип топлива!\n" +
-                                "Возможные типы топлива: ${FuelType.entries.joinToString(", ") { it.description }}"
-                    )
-                }
-            } catch (e: IllegalArgumentException) {
-                println(e.message)
-            }
-        }
+        return console.validReadFuelType()
     }
 }

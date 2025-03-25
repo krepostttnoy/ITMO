@@ -5,6 +5,7 @@ import baseClasses.Vehicle
 import collection.CollectionManager
 import console.ConsoleReadValid
 import console.Read
+import utils.inputOutput.OutputManager
 
 /**
  * Команда для удаления всех транспортных средств с мощностью двигателя больше заданного значения.
@@ -17,7 +18,8 @@ import console.Read
  */
 class RemoveGreaterCommand(
     private val cm: CollectionManager,
-    private val r: Read
+    private val r: Read,
+    private val outputManager: OutputManager
 ) : Command {
 
     /**
@@ -35,12 +37,12 @@ class RemoveGreaterCommand(
      */
     fun execute(enginePowerStr: String? = null) {
         if (cm.baseCollection.isEmpty()) {
-            println("Коллекция пуста.")
+            outputManager.println("Коллекция пуста.")
             return
         }
 
         val enginePower = enginePowerStr?.toFloatOrNull() ?: run {
-            print("Введите enginePower для сравнения: ")
+            outputManager.print("Введите enginePower для сравнения: ")
             r.readFloat() ?: return
         }
 
@@ -56,7 +58,7 @@ class RemoveGreaterCommand(
         val toRemove = cm.baseCollection.filter { it > element }
 
         if (toRemove.isEmpty()) {
-            println("Нет элементов, превышающих enginePower заданного.")
+            outputManager.println("Нет элементов, превышающих enginePower заданного.")
             return
         }
 
@@ -65,10 +67,10 @@ class RemoveGreaterCommand(
             Vehicle.existingIds.remove(vehicle.id)
         }
 
-        println("Удалено ${toRemove.size} элементов.")
+        outputManager.println("Удалено ${toRemove.size} элементов.")
 
         toRemove.forEach { vehicle ->
-            println("Удалён объект с enginePower = ${vehicle.enginePower}")
+            outputManager.println("Удалён объект с enginePower = ${vehicle.enginePower}")
         }
     }
 

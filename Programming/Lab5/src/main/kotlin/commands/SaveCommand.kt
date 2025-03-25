@@ -17,9 +17,6 @@ class SaveCommand(private val fm: IFileManager) : Command {
      *
      * @param filePath Путь к файлу, в который нужно сохранить коллекцию (может быть null).
      */
-    fun execute(filePath: String? = null) {
-        fm.saveToFile(filePath ?: fm.getFilePath())
-    }
 
     /**
      * Выполняет команду без аргументов.
@@ -27,6 +24,6 @@ class SaveCommand(private val fm: IFileManager) : Command {
      * что приводит к использованию пути по умолчанию.
      */
     override fun execute() {
-        execute(null)
+        fm.saveToFile()
     }
 }

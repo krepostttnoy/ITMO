@@ -1,6 +1,7 @@
 package collection
 
 import baseClasses.Vehicle
+import utils.inputOutput.OutputManager
 import java.time.LocalDateTime
 
 
@@ -18,12 +19,9 @@ class CollectionManager {
     /**
      * Список транспортных средств, хранимых в коллекции.
      */
+    val outputManager = OutputManager()
     val baseCollection = ArrayList<Vehicle>()
 
-    /**
-     * Дата и время инициализации коллекции.
-     * Устанавливается автоматически при создании объекта.
-     */
     private val initializationDate: LocalDateTime = LocalDateTime.now()
 
     /**
@@ -67,7 +65,7 @@ class CollectionManager {
      * Включает тип коллекции, дату инициализации и количество элементов.
      */
     fun printCollectionInfo() {
-        println("Информация о коллекции:\n" +
+        outputManager.surePrint("Информация о коллекции:\n" +
                 "Тип: ${baseCollection.javaClass.simpleName}<${Vehicle::class.simpleName}>\n" +
                 "Дата инициализации: $initializationDate\n" +
                 "Кол-во элементов: ${baseCollection.size}")

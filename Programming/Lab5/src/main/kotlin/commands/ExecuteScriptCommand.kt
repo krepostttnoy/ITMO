@@ -2,12 +2,15 @@ package commands
 
 import collection.CollectionManager
 import file.IFileManager
+import utils.inputOutput.InputManager
+import utils.inputOutput.OutputManager
 import java.io.BufferedInputStream
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.lang.Exception
+import java.util.Stack
 
 /**
  * Команда для выполнения скрипта из файла.
@@ -22,19 +25,16 @@ import java.lang.Exception
 class ExecuteScriptCommand(
     private val cm: CollectionManager,
     private val fm: IFileManager,
-    private val ce: ICommandExecutor
+    private val ce: ICommandExecutor,
+    private val outputManager: OutputManager,
+    private val inputManager: InputManager
 ) : Command {
 
     /**
      * Статический объект для отслеживания выполняемых скриптов.
      * Хранит множество путей к файлам, которые уже выполняются, чтобы избежать рекурсии.
      */
-    companion object {
-        /**
-         * Множество канонических путей к файлам, которые в данный момент выполняются.
-         */
-        private val executingScr = mutableSetOf<String>()
-    }
+
 
     /**
      * Выполняет команды из файла, указанного по пути [fileName].
@@ -51,56 +51,47 @@ class ExecuteScriptCommand(
      */
     fun execute(fileName: String?) {
         val srcPath = fileName ?: run {
-            print("Введите путь к файлу: ")
+            outputManager.print("Введите путь к файлу: ")
             readLine()?.trim() ?: return
         }
 
         val file = File(srcPath)
         if (!file.exists()) {
-            println("Файл не найден.")
+            outputManager.println("Файл не найден.")
             return
         }
 
         if (!file.canRead()) {
-            println("Нет прав на чтение данного файла.")
+            outputManager.println("Нет прав на чтение данного файла.")
             return
         }
 
-        val canonicalPath = file.canonicalPath
-        if (executingScr.contains(canonicalPath)) {
-            println("Скрипт уже выполняется.")
-            return
-        }
+        inputManager.startScriptRead(srcPath)
 
-        executingScr.add(canonicalPath)
+        val reader = BufferedReader(InputStreamReader(FileInputStream(file)))
+
 
         try {
-            BufferedInputStream(FileInputStream(file)).use { inputStream ->
-                BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                    var line: String?
-                    var lineNumber = 0
-                    while (reader.readLine().also { line = it } != null) {
-                        lineNumber++
-                        val commandStr = line?.trim()
+            var line: String?
+            var lineNumber = 0
+            while (reader.readLine().also { line = it } != null) {
+                lineNumber++
+                val commandStr = line?.trim()
 
-                        if (commandStr.isNullOrEmpty()) {
-                            println("Пустая строка пропущена.")
-                            continue
-                        }
+                if (commandStr.isNullOrEmpty()) {
+                    outputManager.println("Пустая строка пропущена.")
+                    continue
+                }
 
-                        println("Выполняется команда из скрипта (строка $lineNumber): $commandStr")
-                        try {
-                            ce.executeCommand(commandStr)
-                        } catch (e: Exception) {
-                            println("Ошибка при выполнении команды $commandStr: ${e.message}")
-                        }
-                    }
+                outputManager.println("Выполняется команда из скрипта (строка $lineNumber): $commandStr")
+                try {
+                    ce.executeCommand(commandStr)
+                } catch (e: Exception) {
+                    outputManager.println("${e.message}")
                 }
             }
         } catch (e: Exception) {
-            println("Ошибка при чтении файла: ${e.message}")
-        } finally {
-            executingScr.remove(canonicalPath)
+            outputManager.println("Ошибка при чтении файла: ${e.message}")
         }
     }
 

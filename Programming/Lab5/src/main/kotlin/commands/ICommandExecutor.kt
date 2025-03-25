@@ -14,8 +14,5 @@ interface ICommandExecutor {
      */
     fun executeCommand(commandStr: String)
 
-    /**
-     * Выводит информацию о доступных командах.
-     */
     fun getHelp()
 }

@@ -1,6 +1,7 @@
 package commands
 
 import collection.CollectionManager
+import utils.inputOutput.OutputManager
 
 /**
  * Команда для вычисления среднего значения мощности двигателя транспортных средств в коллекции.
@@ -10,7 +11,10 @@ import collection.CollectionManager
  * @property cm Менеджер коллекции, содержащий список транспортных средств.
  * @constructor Создаёт команду [AvgOfEnginePowerCommand] с заданным менеджером [cm].
  */
-class AvgOfEnginePowerCommand(private val cm: CollectionManager) : Command {
+class AvgOfEnginePowerCommand(
+    private val cm: CollectionManager,
+    private val outputManager: OutputManager
+    ) : Command {
 
     /**
      * Выполняет команду вычисления среднего значения мощности двигателя.
@@ -23,7 +27,7 @@ class AvgOfEnginePowerCommand(private val cm: CollectionManager) : Command {
      */
     override fun execute() {
         if (cm.baseCollection.isEmpty()) {
-            println("Коллекция пуста.")
+            outputManager.println("Коллекция пуста.")
             return
         }
 
@@ -32,6 +36,6 @@ class AvgOfEnginePowerCommand(private val cm: CollectionManager) : Command {
             (vehicle.enginePower ?: 0.0f).toDouble()
         }
 
-        println("Avg: ${sum/size}. Sum -> $sum, size -> $size")
+            outputManager.println("Avg: ${sum/size}. Sum -> $sum, size -> $size")
     }
 }

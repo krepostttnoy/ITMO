@@ -19,6 +19,8 @@ import org.mockito.kotlin.mock
 import kotlin.test.assertEquals
 import java.io.File
 import org.mockito.kotlin.verify
+import utils.inputOutput.InputManager
+import utils.inputOutput.OutputManager
 
 class CommandsTest {
     private lateinit var cm: CollectionManager
@@ -26,6 +28,8 @@ class CommandsTest {
     private lateinit var r: Read
     private lateinit var ce: ICommandExecutor
     private lateinit var fm: IFileManager
+    private lateinit var outputManager: OutputManager
+    private lateinit var inputManager: InputManager
 
     @BeforeEach
     fun setUp(){
@@ -34,6 +38,8 @@ class CommandsTest {
         vm = mock()
         ce = mock()
         fm = mock()
+        outputManager = OutputManager()
+        inputManager = InputManager(outputManager)
     }
 
     @Test
@@ -70,7 +76,7 @@ class CommandsTest {
 
         Mockito.`when`(r.readFloat()).thenReturn((120.0f))
 
-        val removeGreaterCommand = RemoveGreaterCommand(cm, r)
+        val removeGreaterCommand = RemoveGreaterCommand(cm, r, outputManager)
         removeGreaterCommand.execute()
 
         assertEquals(2, cm.baseCollection.size)
@@ -101,7 +107,7 @@ class CommandsTest {
         cm.addVehicle(vehicle1)
         cm.addVehicle(vehicle2)
 
-        val minByFuelTypeCommand = MinByFuelTypeCommand(cm)
+        val minByFuelTypeCommand = MinByFuelTypeCommand(cm, outputManager)
         minByFuelTypeCommand.execute()
 
         val minVehicle = cm.baseCollection.minByOrNull { vehicle ->
@@ -149,7 +155,7 @@ class CommandsTest {
 
         Mockito.`when`(r.readFloat()).thenReturn(engPw)
 
-        val countGrThanEngPwCommand = CountGrThanEngPwCommand(cm, r)
+        val countGrThanEngPwCommand = CountGrThanEngPwCommand(cm, r, outputManager)
         countGrThanEngPwCommand.execute()
 
         val count = cm.baseCollection.filter{it > vehicle3}.size
@@ -162,7 +168,7 @@ class CommandsTest {
         val file = File.createTempFile("test_script", ".txt")
         file.writeText("add\nmin_by_fuel_type")
 
-        val executeScriptCommand = ExecuteScriptCommand(cm, fm, ce)
+        val executeScriptCommand = ExecuteScriptCommand(cm, fm, ce, outputManager, inputManager)
         executeScriptCommand.execute(file.canonicalPath)
 
         verify(ce).executeCommand("add")
@@ -171,7 +177,7 @@ class CommandsTest {
 
     @Test
     fun `ExecuteScriptCommand should handle non-existent file error`() {
-        val executeScriptCommand = ExecuteScriptCommand(cm, fm, ce)
+        val executeScriptCommand = ExecuteScriptCommand(cm, fm, ce, outputManager, inputManager)
 
         try {
             executeScriptCommand.execute("nonexistent.txt")

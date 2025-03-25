@@ -7,6 +7,8 @@ import console.ConsoleVehicleManager
 import console.Read
 import file.ConsoleFileManager
 import file.IFileManager
+import utils.inputOutput.InputManager
+import utils.inputOutput.OutputManager
 
 /**
  * Класс для выполнения команд из консоли.
@@ -21,36 +23,38 @@ import file.IFileManager
  */
 class ConsoleCommandExecutor(
     private val cm: CollectionManager,
-    private val fm: IFileManager
+    private val fm: IFileManager,
+    private val inputManager: InputManager,
+    private val outputManager: OutputManager
 ) : ICommandExecutor {
 
+    private val crm = ConsoleReadManager(outputManager, inputManager)
+    private val crv = ConsoleReadValid(outputManager, inputManager)
+    private val vehicleManager = ConsoleVehicleManager(crm)
     /**
      * Словарь доступных команд.
      * Ключи — названия команд, значения — объекты команд, реализующие [Command].
      */
     private val commands = mapOf(
-        "add" to AddCommand(cm, ConsoleVehicleManager(ConsoleReadManager())),
+        "add" to AddCommand(cm, vehicleManager, outputManager),
         "help" to HelpCommand(this),
         "info" to InfoCommand(cm),
-        "show" to ShowCommand(cm),
-        "exit" to ExitCommand(cm),
-        "update_id" to UpdateIdCommand(cm),
-        "remove_by_id" to RemoveByIdCommand(cm),
-        "clear" to ClearCommand(cm),
-        "remove_at" to RemoveAtCommand(cm, ConsoleReadValid()),
+        "show" to ShowCommand(cm, outputManager,),
+        "exit" to ExitCommand(outputManager),
+        "update_id" to UpdateIdCommand(cm, outputManager, inputManager),
+        "remove_by_id" to RemoveByIdCommand(cm, outputManager, inputManager),
+        "clear" to ClearCommand(cm, outputManager),
+        "remove_at" to RemoveAtCommand(cm, crv, outputManager),
         "save" to SaveCommand(fm),
-        "add_if_max" to AddIfMaxCommand(cm, ConsoleVehicleManager(ConsoleReadManager())),
-        "remove_greater" to RemoveGreaterCommand(cm, ConsoleReadValid()),
-        "avg_of_eng_pw" to AvgOfEnginePowerCommand(cm),
-        "count_gr_than_eng_pw" to CountGrThanEngPwCommand(cm, ConsoleReadValid()),
-        "min_by_fuel_type" to MinByFuelTypeCommand(cm),
-        "execute_script" to ExecuteScriptCommand(cm, fm, this)
+        "add_if_max" to AddIfMaxCommand(cm, vehicleManager, outputManager),
+        "remove_greater" to RemoveGreaterCommand(cm, crv, outputManager),
+        "avg_of_eng_pw" to AvgOfEnginePowerCommand(cm, outputManager),
+        "count_gr_than_eng_pw" to CountGrThanEngPwCommand(cm, crv, outputManager),
+        "min_by_fuel_type" to MinByFuelTypeCommand(cm, outputManager),
+        "execute_script" to ExecuteScriptCommand(cm, fm, this, outputManager, inputManager),
+        "disable_output" to DisableOutputCommand(outputManager),
+        "enable_output" to EnableOutputCommand(outputManager)
     )
-
-    /**
-     * Объект для чтения и валидации данных из консоли.
-     */
-    val console = ConsoleReadValid()
 
     /**
      * Выполняет команду на основе введённой строки.
@@ -66,14 +70,13 @@ class ConsoleCommandExecutor(
 
         val command = commands[commandName]
         if (command == null) {
-            println("Unknown command. Available commands: ${commands.keys.joinToString(", ")}")
+            outputManager.surePrint("Unknown command. Available commands: ${commands.keys.joinToString(", ")}")
             return
         }
 
         when (command) {
             is RemoveByIdCommand -> command.execute(arg)
             is RemoveAtCommand -> command.execute(arg)
-            is SaveCommand -> command.execute(arg)
             is RemoveGreaterCommand -> command.execute(arg)
             is CountGrThanEngPwCommand -> command.execute(arg)
             is ExecuteScriptCommand -> command.execute(arg)
@@ -85,6 +88,6 @@ class ConsoleCommandExecutor(
      * Выводит список доступных команд в консоль.
      */
     override fun getHelp() {
-        println("Доступные команды: ${commands.keys.joinToString(", ").lowercase()}")
+        outputManager.surePrint("Доступные команды: ${commands.keys.joinToString(", ").lowercase()}")
     }
 }

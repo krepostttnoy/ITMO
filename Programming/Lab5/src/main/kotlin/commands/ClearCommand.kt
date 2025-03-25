@@ -2,6 +2,7 @@ package commands
 
 import baseClasses.Vehicle
 import collection.CollectionManager
+import utils.inputOutput.OutputManager
 
 /**
  * Команда для очистки коллекции транспортных средств.
@@ -10,7 +11,10 @@ import collection.CollectionManager
  * @property cm Менеджер коллекции, который будет очищен.
  * @constructor Создаёт команду [ClearCommand] с заданным менеджером [cm].
  */
-class ClearCommand(private val cm: CollectionManager) : Command {
+class ClearCommand(
+    private val cm: CollectionManager,
+    private val outputManager: OutputManager
+    ) : Command {
 
     /**
      * Выполняет команду очистки коллекции.
@@ -23,12 +27,12 @@ class ClearCommand(private val cm: CollectionManager) : Command {
      */
     override fun execute() {
         if (cm.baseCollection.isEmpty()) {
-            println("Коллекция пуста.")
+            outputManager.println("Коллекция пуста.")
             return
         }
 
         cm.baseCollection.clear()
         Vehicle.existingIds.clear()
-        println("Все элементы удалены. Размер коллекции: ${cm.baseCollection.size}")
+            outputManager.println("Все элементы удалены. Размер коллекции: ${cm.baseCollection.size}")
     }
 }

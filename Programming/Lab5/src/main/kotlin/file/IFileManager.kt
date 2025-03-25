@@ -6,6 +6,6 @@ package file
  */
 interface IFileManager {
     fun loadFromFile(filePath: String)
-    fun saveToFile(filePath: String)
+    fun saveToFile()
     fun getFilePath(): String
 }

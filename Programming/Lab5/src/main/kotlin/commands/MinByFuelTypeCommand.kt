@@ -2,6 +2,7 @@ package commands
 
 import baseClasses.FuelType
 import collection.CollectionManager
+import utils.inputOutput.OutputManager
 
 /**
  * Команда для поиска транспортного средства с минимальным значением [FuelType].
@@ -11,7 +12,10 @@ import collection.CollectionManager
  * @property cm Менеджер коллекции, содержащий список транспортных средств.
  * @constructor Создаёт команду [MinByFuelTypeCommand] с заданным менеджером [cm].
  */
-class MinByFuelTypeCommand(private val cm: CollectionManager) : Command {
+class MinByFuelTypeCommand(
+    private val cm: CollectionManager,
+    private val outputManager: OutputManager
+    ) : Command {
 
     /**
      * Выполняет команду поиска транспортного средства с минимальным значением [FuelType].
@@ -24,7 +28,7 @@ class MinByFuelTypeCommand(private val cm: CollectionManager) : Command {
      */
     override fun execute() {
         if (cm.baseCollection.isEmpty()) {
-            println("Коллекция пуста. Нет элементов для поиска минимального fuelType.")
+            outputManager.println("Коллекция пуста. Нет элементов для поиска минимального fuelType.")
             return
         }
 
@@ -33,10 +37,10 @@ class MinByFuelTypeCommand(private val cm: CollectionManager) : Command {
         }
 
         if (minVehicle == null) {
-            println("Не удалось найти элемент с минимальным fuelType.")
+            outputManager.println("Не удалось найти элемент с минимальным fuelType.")
             return
         }
 
-        println("${minVehicle.name} -> ${minVehicle.fuelType}")
+        outputManager.println("${minVehicle.name} -> ${minVehicle.fuelType}")
     }
 }

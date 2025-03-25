@@ -5,6 +5,7 @@
 import commands.ConsoleCommandExecutor
 import collection.CollectionManager
 import file.ConsoleFileManager
+import utils.Console
 
 /**
  * Точка входа в приложение.
@@ -15,19 +16,7 @@ import file.ConsoleFileManager
  * @throws StackOverflowError Если возникла рекурсия (например, при выполнении скрипта).
  */
 fun main() {
-    try {
-        val cm = CollectionManager()
-        val fm = ConsoleFileManager(cm)
-        val ce = ConsoleCommandExecutor(cm, fm)
+    val console = Console()
 
-        while (true) {
-            print("$ ")
-            val input = readLine()?.trim()
-            ce.executeCommand(input!!.lowercase())
-        }
-    } catch (e: IllegalArgumentException) {
-        println("${e.message}")
-    } catch (e: StackOverflowError) {
-        println("${e.message}")
-    }
+    console.startInteractiveMode()
 }

@@ -2,6 +2,7 @@ package commands
 
 import collection.CollectionManager
 import console.IVehicleManager
+import utils.inputOutput.OutputManager
 
 /**
  * Команда для добавления нового транспортного средства в коллекцию, если оно больше максимального.
@@ -14,7 +15,8 @@ import console.IVehicleManager
  */
 class AddIfMaxCommand(
     private val cm: CollectionManager,
-    private val vm: IVehicleManager
+    private val vm: IVehicleManager,
+    private val outputManager: OutputManager
 ) : Command {
 
     /**
@@ -29,16 +31,16 @@ class AddIfMaxCommand(
      */
     override fun execute() {
         if (cm.baseCollection.isEmpty()) {
-            println("Коллекция пуста.")
+            outputManager.println("Коллекция пуста.")
             val newVehicle = vm.setVehicle()
             cm.addVehicle(newVehicle)
-            println("Объект добавлен в коллекцию.")
+            outputManager.println("Объект добавлен в коллекцию.")
             return
         }
 
         val maxVehicle = cm.baseCollection.maxWithOrNull(compareBy { it.enginePower })
         if (maxVehicle == null) {
-            println("Ошибка: не удалось определить максимальный элемент.")
+            outputManager.println("Ошибка: не удалось определить максимальный элемент.")
             return
         }
 
@@ -46,9 +48,9 @@ class AddIfMaxCommand(
 
         if (newVehicle.compareTo(maxVehicle) > 0) {
             cm.addVehicle(newVehicle)
-            println("Объект добавлен в коллекцию.")
+                outputManager.println("Объект добавлен в коллекцию.")
         } else {
-            println("Объект не может быть добавлен в коллекцию.")
+            outputManager.println("Объект не может быть добавлен в коллекцию.")
         }
     }
 }

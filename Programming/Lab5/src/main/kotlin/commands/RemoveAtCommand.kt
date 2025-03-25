@@ -4,6 +4,7 @@ import baseClasses.Vehicle
 import collection.CollectionManager
 import console.ConsoleReadValid
 import console.Read
+import utils.inputOutput.OutputManager
 
 /**
  * Команда для удаления транспортного средства из коллекции по указанному индексу.
@@ -15,7 +16,8 @@ import console.Read
  */
 class RemoveAtCommand(
     private val cm: CollectionManager,
-    private val rm: Read
+    private val rm: Read,
+    private val outputManager: OutputManager
 ) : Command {
 
     /**
@@ -25,26 +27,26 @@ class RemoveAtCommand(
      */
     fun execute(indexStr: String? = null) {
         if (cm.baseCollection.isEmpty()) {
-            println("Коллекция пуста.")
+            outputManager.println("Коллекция пуста.")
             return
         }
 
         val index: Int? = if (indexStr == null) {
-            print("Введите индекс элемента для удаления (0-${cm.baseCollection.size - 1}): ")
+            outputManager.print("Введите индекс элемента для удаления (0-${cm.baseCollection.size - 1}): ")
             rm.readInt()
         } else {
             indexStr.toIntOrNull()
         }
 
         if (index == null || index < 0 || index >= cm.baseCollection.size) {
-            println("Неверный индекс")
+            outputManager.println("Неверный индекс")
             return
         }
 
         val vehicleToRemove = cm.baseCollection[index]
         cm.baseCollection.removeAt(index)
         Vehicle.existingIds.remove(vehicleToRemove.id)
-        println("Элемент удален.")
+        outputManager.println("Элемент удален.")
     }
 
     /**
