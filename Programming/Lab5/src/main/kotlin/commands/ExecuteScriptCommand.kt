@@ -29,7 +29,14 @@ class ExecuteScriptCommand(
     private val outputManager: OutputManager,
     private val inputManager: InputManager
 ) : Command {
+    override val interactive = true
 
+    companion object {
+        /**
+         * Множество канонических путей к файлам, которые в данный момент выполняются.
+         */
+        private val executingScr = mutableSetOf<String>()
+    }
     /**
      * Статический объект для отслеживания выполняемых скриптов.
      * Хранит множество путей к файлам, которые уже выполняются, чтобы избежать рекурсии.
@@ -49,10 +56,11 @@ class ExecuteScriptCommand(
      * @param fileName Путь к файлу со скриптом (может быть null, тогда путь запрашивается у пользователя).
      * @throws Exception Если произошла ошибка при чтении файла или выполнении команды.
      */
-    fun execute(fileName: String?) {
+    override fun execute(fileName: String?) {
+
         val srcPath = fileName ?: run {
             outputManager.print("Введите путь к файлу: ")
-            readLine()?.trim() ?: return
+            inputManager.read()
         }
 
         val file = File(srcPath)
@@ -61,37 +69,44 @@ class ExecuteScriptCommand(
             return
         }
 
+        val canonicalPath = file.canonicalPath
+        if (executingScr.contains(canonicalPath)) {
+            println("Скрипт уже выполняется.")
+            return
+        }
+
+        executingScr.add(canonicalPath)
+
         if (!file.canRead()) {
             outputManager.println("Нет прав на чтение данного файла.")
             return
         }
 
-        inputManager.startScriptRead(srcPath)
-
-        val reader = BufferedReader(InputStreamReader(FileInputStream(file)))
-
-
         try {
-            var line: String?
+            inputManager.startScriptRead(srcPath)
             var lineNumber = 0
-            while (reader.readLine().also { line = it } != null) {
+            while (inputManager.isScriptMode()) {
+                val line = inputManager.read()
                 lineNumber++
-                val commandStr = line?.trim()
-
-                if (commandStr.isNullOrEmpty()) {
-                    outputManager.println("Пустая строка пропущена.")
+                if (line.isEmpty()) {
+                    if (!inputManager.isScriptMode()) break // Прерываем, если файл закончился
+                    outputManager.println("Пустая строка пропущена (строка $lineNumber).")
                     continue
                 }
 
-                outputManager.println("Выполняется команда из скрипта (строка $lineNumber): $commandStr")
+                outputManager.println("Выполняется команда из скрипта (строка $lineNumber): $line")
                 try {
-                    ce.executeCommand(commandStr)
+                    ce.executeCommand(line)
                 } catch (e: Exception) {
                     outputManager.println("${e.message}")
                 }
             }
         } catch (e: Exception) {
             outputManager.println("Ошибка при чтении файла: ${e.message}")
+            inputManager.finishScriptRead()
+        }finally {
+
+            executingScr.remove(canonicalPath)
         }
     }
 
@@ -100,7 +115,5 @@ class ExecuteScriptCommand(
      * Вызывает [execute] с параметром [fileName] равным null,
      * что приводит к запросу пути к файлу у пользователя.
      */
-    override fun execute() {
-        execute(null)
-    }
+
 }

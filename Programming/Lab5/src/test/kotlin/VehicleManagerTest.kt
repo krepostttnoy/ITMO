@@ -21,7 +21,7 @@ class VehicleManagerTest {
 
     @Test
     fun `setVehicle should set new vehicle with valid input`() {
-        // Настраиваем поведение мока
+
         Mockito.`when`(rm.readName()).thenReturn("Car1")
         Mockito.`when`(rm.readCoordinateX()).thenReturn(10L)
         Mockito.`when`(rm.readCoordinateY()).thenReturn(20L)

@@ -15,6 +15,7 @@ class ClearCommand(
     private val cm: CollectionManager,
     private val outputManager: OutputManager
     ) : Command {
+    override val interactive = false
 
     /**
      * Выполняет команду очистки коллекции.
@@ -25,7 +26,7 @@ class ClearCommand(
      * 3. Очищает список использованных идентификаторов в [Vehicle.existingIds].
      * 4. Выводит сообщение об успешной очистке и текущий размер коллекции.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
         if (cm.baseCollection.isEmpty()) {
             outputManager.println("Коллекция пуста.")
             return

@@ -11,6 +11,7 @@ class InputManager(private val outputManager: OutputManager) {
     private var inputStream = System.`in`
     private var scriptMode = false
     private var files:Stack<File> = Stack()
+    private var pausedScriptScanner: Scanner? = null
 
     constructor(
         inputStream: InputStream,
@@ -38,16 +39,18 @@ class InputManager(private val outputManager: OutputManager) {
 
     fun startScriptRead(filePath: String){
         val file = File(filePath)
-        if (file in files){
-            outputManager.println("File already going.")
-            throw IllegalStateException("Рекурсия обнаружена: файл ${file.name} уже выполняется.")
-        }else{
-            outputManager.println("Start executing script from file ${file.name}")
-            scanners.push(Scanner(FileReader(file)))
-            files.push(file)
-            scriptMode = true
-            outputManager.disableOutput()
-        }
+        try {
+            if (file in files){
+                outputManager.surePrint("File already going.")
+                throw IllegalStateException("Рекурсия обнаружена: файл ${file.name} уже выполняется.")
+            }else{
+                outputManager.println("Start executing script from file ${file.name}")
+                scanners.push(Scanner(FileReader(file)))
+                files.push(file)
+                outputManager.disableOutput()
+                scriptMode = true
+            }
+        }catch (e: Exception){outputManager.surePrint(e.message.toString())}
     }
 
     fun finishScriptRead(){
@@ -58,4 +61,15 @@ class InputManager(private val outputManager: OutputManager) {
         files.pop()
     }
 
+    fun isScriptMode(): Boolean = scriptMode
+
+    fun switchToInteractive(){
+        scanners.push(Scanner(System.`in`))
+        scriptMode = false
+    }
+
+    fun returnToScript(){
+        scanners.pop()
+        scriptMode = true
+    }
 }

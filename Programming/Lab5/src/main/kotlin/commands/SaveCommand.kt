@@ -10,6 +10,7 @@ import file.IFileManager
  * @constructor Создаёт команду [SaveCommand] с заданным менеджером [fm].
  */
 class SaveCommand(private val fm: IFileManager) : Command {
+    override val interactive = false
 
     /**
      * Выполняет команду сохранения коллекции в файл.
@@ -23,7 +24,7 @@ class SaveCommand(private val fm: IFileManager) : Command {
      * Вызывает [execute] с параметром [filePath] равным null,
      * что приводит к использованию пути по умолчанию.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
         fm.saveToFile()
     }
 }

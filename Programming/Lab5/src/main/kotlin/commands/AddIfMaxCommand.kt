@@ -18,6 +18,7 @@ class AddIfMaxCommand(
     private val vm: IVehicleManager,
     private val outputManager: OutputManager
 ) : Command {
+    override val interactive = true
 
     /**
      * Выполняет команду добавления нового транспортного средства, если оно больше максимального.
@@ -29,7 +30,7 @@ class AddIfMaxCommand(
      * 4. Если новый объект больше максимального (по [Vehicle.compareTo]), добавляет его в коллекцию.
      * 5. Выводит сообщение о результате операции.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
         if (cm.baseCollection.isEmpty()) {
             outputManager.println("Коллекция пуста.")
             val newVehicle = vm.setVehicle()

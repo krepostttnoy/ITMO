@@ -1,9 +1,7 @@
 package commands
 
 import baseClasses.ExitFlag
-import collection.CollectionManager
 import utils.inputOutput.OutputManager
-import kotlin.system.exitProcess
 
 /**
  * Команда для завершения работы программы.
@@ -15,12 +13,13 @@ import kotlin.system.exitProcess
 class ExitCommand(
     private val outputManager: OutputManager,
     ) : Command {
+    override val interactive = false
 
     /**
      * Выполняет команду завершения программы.
      * Выводит сообщение "Программа завершена." и завершает процесс с кодом 0.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
         outputManager.disableOutput()
         outputManager.surePrint("Программа завершена.")
         ExitFlag.exitFlag = true

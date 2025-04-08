@@ -3,15 +3,15 @@ package commands
 import baseClasses.Coordinates
 import baseClasses.Vehicle
 import collection.CollectionManager
-import console.ConsoleReadValid
-import console.ConsoleReadManager
+import console.Validator
+import console.Reader
 import utils.inputOutput.InputManager
 import utils.inputOutput.OutputManager
 
 /**
  * Команда для обновления данных транспортного средства в коллекции по его идентификатору.
- * Использует [CollectionManager] для управления коллекцией, [ConsoleReadValid] для чтения данных от пользователя
- * и [ConsoleReadManager] для ввода новых значений полей.
+ * Использует [CollectionManager] для управления коллекцией, [Validator] для чтения данных от пользователя
+ * и [Reader] для ввода новых значений полей.
  *
  * @property cm Менеджер коллекции, содержащий список транспортных средств.
  * @property console Объект для чтения и валидации данных из консоли.
@@ -22,11 +22,11 @@ class UpdateIdCommand(
     private val outputManager: OutputManager,
     private val inputManager: InputManager
     ) : Command {
-
+    override val interactive = true
     /**
      * Объект для чтения и валидации данных из консоли.
      */
-    val console = ConsoleReadValid(outputManager, inputManager)
+    val console = Validator(outputManager, inputManager)
 
     /**
      * Выполняет команду обновления данных транспортного средства по указанному идентификатору.
@@ -37,10 +37,10 @@ class UpdateIdCommand(
      * 3. Запрашивает у пользователя ID элемента для обновления.
      * 4. Если ID некорректен или элемент не найден, выводит сообщение об ошибке.
      * 5. Запрашивает у пользователя поле для обновления (name, coordinates, enginePower, capacity, distanceTravelled, fuelType).
-     * 6. Обновляет указанное поле с помощью [ConsoleReadManager], создавая копию объекта [Vehicle] с новым значением.
+     * 6. Обновляет указанное поле с помощью [Reader], создавая копию объекта [Vehicle] с новым значением.
      * 7. Заменяет старый элемент в коллекции на обновлённый.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
         if (cm.baseCollection.isNotEmpty()) {
             cm.baseCollection.forEach { vehicle ->
                 outputManager.println("Список доступных ID: ${vehicle.id}, name - ${vehicle.name}")
@@ -57,7 +57,7 @@ class UpdateIdCommand(
             val field = console.readLineTrimmed()
             val oldVehicle = cm.baseCollection[index]
             Vehicle.removeId(oldVehicle.id)
-            val rm = ConsoleReadManager(outputManager, inputManager)
+            val rm = Reader(outputManager, inputManager)
             val newVehicle = when (field) {
                 "name" -> {
                     val newName = rm.readName()

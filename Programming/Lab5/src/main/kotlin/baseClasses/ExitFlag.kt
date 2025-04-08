@@ -8,6 +8,6 @@ object ExitFlag {
             return workStatus
         }
         set(value) {
-            exitFlag = value
+            workStatus = value
         }
 }

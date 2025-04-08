@@ -1,3 +1,5 @@
-add
 help
-execute_script /Users/mark/Programming/languages/Kotlin/Lab5/src/main/kotlin/script.txt
+enable_output
+add
+info
+execute_script /Users/mark/Programming/languages/Kotlin/Lab5/src/main/kotlin/script2.txt

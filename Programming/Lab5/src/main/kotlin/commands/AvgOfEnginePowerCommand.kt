@@ -15,6 +15,7 @@ class AvgOfEnginePowerCommand(
     private val cm: CollectionManager,
     private val outputManager: OutputManager
     ) : Command {
+    override val interactive = false
 
     /**
      * Выполняет команду вычисления среднего значения мощности двигателя.
@@ -25,7 +26,7 @@ class AvgOfEnginePowerCommand(
      * 3. Делит сумму на количество элементов в коллекции.
      * 4. Выводит среднее значение, сумму и размер коллекции.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
         if (cm.baseCollection.isEmpty()) {
             outputManager.println("Коллекция пуста.")
             return

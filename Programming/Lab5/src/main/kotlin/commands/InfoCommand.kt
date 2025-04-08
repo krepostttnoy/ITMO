@@ -10,12 +10,12 @@ import collection.CollectionManager
  * @constructor Создаёт команду [InfoCommand] с заданным менеджером [cm].
  */
 class InfoCommand(private val cm: CollectionManager) : Command {
-
+    override val interactive = false
     /**
      * Выполняет команду вывода информации о коллекции.
      * Вызывает метод [CollectionManager.printCollectionInfo] для отображения информации.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
         cm.printCollectionInfo()
     }
 }

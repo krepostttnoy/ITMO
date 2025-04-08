@@ -1,6 +1,7 @@
 package utils
 
 import baseClasses.ExitFlag
+import baseClasses.ExitFlag.exitFlag
 import collection.CollectionManager
 import commands.ConsoleCommandExecutor
 import file.ConsoleFileManager
@@ -16,10 +17,15 @@ class Console{
 
     fun startInteractiveMode(){
         try {
-            while (!ExitFlag.exitFlag) {
+            while (!exitFlag) {
                 print("$ ")
                 val input = readLine()?.trim()
-                commandExecutor.executeCommand(input!!.lowercase())
+                if(input == null){
+                    return
+                }
+                if(input.isBlank()) continue
+                commandExecutor.executeCommand(input.lowercase())
+
             }
         } catch (e: IllegalArgumentException) {
             println("${e.message}")

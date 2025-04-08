@@ -2,7 +2,6 @@ package commands
 
 import baseClasses.Vehicle
 import collection.CollectionManager
-import console.ConsoleReadValid
 import console.Read
 import utils.inputOutput.OutputManager
 
@@ -19,13 +18,14 @@ class RemoveAtCommand(
     private val rm: Read,
     private val outputManager: OutputManager
 ) : Command {
+    override val interactive = true
 
     /**
      * Выполняет команду удаления транспортного средства по указанному индексу.
      *
      * @param indexStr Строковое представление индекса элемента для удаления (может быть null).
      */
-    fun execute(indexStr: String? = null) {
+    override fun execute(indexStr: String?) {
         if (cm.baseCollection.isEmpty()) {
             outputManager.println("Коллекция пуста.")
             return
@@ -54,7 +54,5 @@ class RemoveAtCommand(
      * Вызывает [execute] с параметром [indexStr] равным null,
      * что приводит к запросу индекса у пользователя.
      */
-    override fun execute() {
-        execute(null)
-    }
+
 }

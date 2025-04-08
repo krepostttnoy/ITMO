@@ -3,7 +3,6 @@ package commands
 import baseClasses.Coordinates
 import baseClasses.Vehicle
 import collection.CollectionManager
-import console.ConsoleReadValid
 import console.Read
 import utils.inputOutput.OutputManager
 import kotlin.text.toFloatOrNull
@@ -22,6 +21,7 @@ class CountGrThanEngPwCommand(
     private val rm: Read,
     private val outputManager: OutputManager
 ) : Command {
+    override val interactive = true
 
     /**
      * Выполняет команду подсчёта количества объектов с мощностью двигателя больше заданного значения.
@@ -35,7 +35,7 @@ class CountGrThanEngPwCommand(
      *
      * @param enginePowerStr Строковое представление мощности двигателя для сравнения (может быть null).
      */
-    fun execute(enginePowerStr: String? = null) {
+    override fun execute(enginePowerStr: String?) {
         if (cm.baseCollection.isEmpty()) {
             outputManager.println("Коллекция пуста.")
             return
@@ -65,7 +65,5 @@ class CountGrThanEngPwCommand(
      * Вызывает [execute] с параметром [enginePowerStr] равным null,
      * что приводит к запросу значения у пользователя.
      */
-    override fun execute() {
-        execute(null)
-    }
+
 }

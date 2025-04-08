@@ -3,7 +3,6 @@ package commands
 import baseClasses.Coordinates
 import baseClasses.Vehicle
 import collection.CollectionManager
-import console.ConsoleReadValid
 import console.Read
 import utils.inputOutput.OutputManager
 
@@ -22,6 +21,8 @@ class RemoveGreaterCommand(
     private val outputManager: OutputManager
 ) : Command {
 
+    override val interactive = true
+
     /**
      * Выполняет команду удаления всех транспортных средств с мощностью двигателя больше заданного значения.
      *
@@ -35,7 +36,7 @@ class RemoveGreaterCommand(
      *
      * @param enginePowerStr Строковое представление мощности двигателя для сравнения (может быть null).
      */
-    fun execute(enginePowerStr: String? = null) {
+    override fun execute(enginePowerStr: String?) {
         if (cm.baseCollection.isEmpty()) {
             outputManager.println("Коллекция пуста.")
             return
@@ -79,7 +80,5 @@ class RemoveGreaterCommand(
      * Вызывает [execute] с параметром [enginePowerStr] равным null,
      * что приводит к запросу значения у пользователя.
      */
-    override fun execute() {
-        execute(null)
-    }
+
 }

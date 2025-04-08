@@ -16,6 +16,7 @@ class MinByFuelTypeCommand(
     private val cm: CollectionManager,
     private val outputManager: OutputManager
     ) : Command {
+    override val interactive = false
 
     /**
      * Выполняет команду поиска транспортного средства с минимальным значением [FuelType].
@@ -26,7 +27,7 @@ class MinByFuelTypeCommand(
      * 3. Если элемент найден, выводит его имя и тип топлива.
      * 4. Если элемент не найден, выводит сообщение об ошибке.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
         if (cm.baseCollection.isEmpty()) {
             outputManager.println("Коллекция пуста. Нет элементов для поиска минимального fuelType.")
             return

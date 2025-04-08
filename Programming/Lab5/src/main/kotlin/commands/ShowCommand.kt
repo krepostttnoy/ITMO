@@ -14,12 +14,13 @@ class ShowCommand(
     private val cm: CollectionManager,
     private val outputManager: OutputManager
     ) : Command {
+    override val interactive = false
 
     /**
      * Выполняет команду отображения элементов коллекции.
      * Вызывает [CollectionManager.printCollection] и выводит результат в консоль.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
         outputManager.println(cm.printCollection())
     }
 }

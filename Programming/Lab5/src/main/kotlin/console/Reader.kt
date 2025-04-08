@@ -9,9 +9,9 @@ import utils.inputOutput.OutputManager
  * Реализует интерфейс [IReadManager], предоставляя методы для ввода различных полей с проверкой корректности.
  *
  * @property console Объект для чтения и валидации данных из консоли.
- * @constructor Создаёт экземпляр [ConsoleReadManager] с объектом [ConsoleReadValid] для чтения данных.
+ * @constructor Создаёт экземпляр [Reader] с объектом [Validator] для чтения данных.
  */
-class ConsoleReadManager(
+class Reader(
     private val outputManager: OutputManager,
     private val inputManager: InputManager
 ) : IReadManager {
@@ -19,7 +19,7 @@ class ConsoleReadManager(
     /**
      * Объект для чтения и валидации данных из консоли.
      */
-    private val console = ConsoleReadValid(outputManager, inputManager)
+    private val console = Validator(outputManager, inputManager)
 
     /**
      * Запрашивает у пользователя ввод имени транспортного средства.

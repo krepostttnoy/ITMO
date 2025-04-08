@@ -1,11 +1,9 @@
 package commands
 
 import collection.CollectionManager
-import console.ConsoleReadManager
-import console.ConsoleReadValid
+import console.Reader
+import console.Validator
 import console.ConsoleVehicleManager
-import console.Read
-import file.ConsoleFileManager
 import file.IFileManager
 import utils.inputOutput.InputManager
 import utils.inputOutput.OutputManager
@@ -28,15 +26,15 @@ class ConsoleCommandExecutor(
     private val outputManager: OutputManager
 ) : ICommandExecutor {
 
-    private val crm = ConsoleReadManager(outputManager, inputManager)
-    private val crv = ConsoleReadValid(outputManager, inputManager)
+    private val crm = Reader(outputManager, inputManager)
+    private val crv = Validator(outputManager, inputManager)
     private val vehicleManager = ConsoleVehicleManager(crm)
     /**
      * Словарь доступных команд.
      * Ключи — названия команд, значения — объекты команд, реализующие [Command].
      */
     private val commands = mapOf(
-        "add" to AddCommand(cm, vehicleManager, outputManager),
+        "add" to AddCommand(cm, vehicleManager, outputManager, inputManager),
         "help" to HelpCommand(this),
         "info" to InfoCommand(cm),
         "show" to ShowCommand(cm, outputManager,),
@@ -66,7 +64,7 @@ class ConsoleCommandExecutor(
     override fun executeCommand(commandStr: String) {
         val parts = commandStr.trim().split("\\s+".toRegex())
         val commandName = parts[0].lowercase()
-        val arg = if (parts.size > 1) parts[1] else null
+        val args = if (parts.size > 1) parts[1] else null
 
         val command = commands[commandName]
         if (command == null) {
@@ -74,16 +72,14 @@ class ConsoleCommandExecutor(
             return
         }
 
-        when (command) {
-            is RemoveByIdCommand -> command.execute(arg)
-            is RemoveAtCommand -> command.execute(arg)
-            is RemoveGreaterCommand -> command.execute(arg)
-            is CountGrThanEngPwCommand -> command.execute(arg)
-            is ExecuteScriptCommand -> command.execute(arg)
-            else -> command.execute()
+        if(command.interactive && inputManager.isScriptMode()) {
+            inputManager.switchToInteractive()
+            command.execute(args)
+            inputManager.returnToScript()
+        }else{
+            command.execute(args)
         }
     }
-
     /**
      * Выводит список доступных команд в консоль.
      */

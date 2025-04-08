@@ -2,6 +2,7 @@ package commands
 
 import collection.CollectionManager
 import console.IVehicleManager
+import utils.inputOutput.InputManager
 import utils.inputOutput.OutputManager
 
 /**
@@ -15,8 +16,11 @@ import utils.inputOutput.OutputManager
 class AddCommand(
     private val cm: CollectionManager,
     private val vm: IVehicleManager,
-    private val outputManager: OutputManager
+    private val outputManager: OutputManager,
+    private val inputManager: InputManager
 ) : Command {
+
+    override val interactive = true
 
     /**
      * Выполняет команду добавления нового транспортного средства.
@@ -25,7 +29,8 @@ class AddCommand(
      *
      * @throws IllegalArgumentException Если создание или добавление объекта [Vehicle] не удалось.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
+
         try {
             val newVehicle = vm.setVehicle()
             cm.addVehicle(newVehicle)

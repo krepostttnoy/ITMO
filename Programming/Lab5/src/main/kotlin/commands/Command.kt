@@ -10,5 +10,7 @@ interface Command {
      * Выполняет команду.
      * Реализация метода зависит от конкретной команды.
      */
-    fun execute()
+    val interactive: Boolean
+    fun execute(args: String?)
+
 }

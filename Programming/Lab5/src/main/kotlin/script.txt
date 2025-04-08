@@ -1,3 +1,8 @@
-execute_script /Users/mark/Programming/languages/Kotlin/Lab5/src/main/kotlin/script.txt
-execute_script /Users/mark/Programming/languages/Kotlin/Lab5/src/main/kotlin/script1.txt
-save
+add
+MyVehicle
+3
+4
+5.0
+6.0
+7
+диз

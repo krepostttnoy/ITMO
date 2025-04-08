@@ -8,12 +8,13 @@ package commands
  * @constructor Создаёт команду [HelpCommand] с заданным исполнителем [ce].
  */
 class HelpCommand(private val ce: ICommandExecutor) : Command {
+    override val interactive = false
 
     /**
      * Выполняет команду вывода списка доступных команд.
      * Вызывает метод [ICommandExecutor.getHelp] для отображения списка.
      */
-    override fun execute() {
+    override fun execute(args: String?) {
         ce.getHelp()
     }
 }
